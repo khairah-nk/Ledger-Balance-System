@@ -48,3 +48,13 @@ button:hover { background: #34495e; }
   font-size: 18px;
   font-weight: bold;
 }
+
+/* Added styles for different result states */
+.result.positive { background: #d4edda; color: #155724; }
+.result.negative { background: #f8d7da; color: #721c24; }
+.result.error {
+  background: #fff3cd;
+  color: #856404;
+  border: 1px solid #ffeeba;
+  font-size: 15px;
+}

@@ -1,11 +1,23 @@
-/* Ledger Balance System
 
-const User = require('./user.js')
+// Issue # The comment at the top was wrongly formatted
+/* Ledger Balance System */
 
-const person = new User("Bin Rashid", "Muhamad Abu Bakar");
+
+// Issue Browsers do not natively support CommonJS require().
+
+import User from './user.js';
+
+
+// Issue # Logic error, It should be firstName and lastName. 
+//const person = new User("Bin Rashid", "Muhamad Abu Bakar");
+const person = new User("Muhamad Abu Bakar","Bin Rashid");
 
 const greeting = document.getElementById("greeting");
-greeting.textContent = `Welcome, ${person.fullname?.lastName}!`;
+
+// Issue # fullname returns a string, and strings don’t have a .lastName property, so this prints “undefined”.
+//greeting.textContent = `Welcome, ${person.fullname?.lastName}!`;
+greeting.textContent = `Welcome, ${person.fullname}!`;
+console.log(`Welcome, ${person.fullname}!`);
 
 const expenses = ["food", "rent", "others", "saving"];
 
@@ -26,6 +38,17 @@ function calculate() {
     percent.toFixed(1) + '%'
   } of income)`;
 
-  result.style.backgroundColor = balance >= 0 ? "#d4edda" : "#f8d7da";
-  result.style.color = balance >= 0 ? "#155724" : "#721c24";
+  // change the background color based on the balance
+//   result.style.backgroundColor = balance >= 0 ? "#d4edda" : "#f8d7da";
+//   result.style.color = balance >= 0 ? "#155724" : "#721c24";
+if (salary <= 0) {
+  result.textContent = "Please enter a salary greater than 0.";
+  result.className = "result error";
+  return;
 }
+
+result.className = balance >= 0 ? "result positive" : "result negative";
+}
+
+
+document.getElementById("calculate").addEventListener("click", calculate);

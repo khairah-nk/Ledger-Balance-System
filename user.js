@@ -5,8 +5,15 @@ class User {
   }
 
   get fullname() {
-    return `${firstName} ${lastName}`;
+    // Issue #3 The object’s fields are only reachable through this
+    return `${this.firstName} ${this.lastName}`;
   }
 }
 
-module.exports = User;
+/*
+ * Browser compatibility note:
+ * Replaced Node.js `module.exports` with standard ES Module `export`
+ * to prevent "ReferenceError: module is not defined" in the browser.
+ */
+
+export default User;
