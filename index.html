@@ -1,36 +1,344 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Ledger Balance System</title>
-
-  <!-- Issue #5 The style sheet file name is without the letter "s" at the end. -->
-  <!-- <link rel="stylesheet" href="style.css"> -->
-   <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ledger Studio — Personal Savings & Operating Ledger</title>
+  <!-- Favicon: waving hand -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>👋</text></svg>" />
+  <!-- Bootstrap 5.3 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <!-- Custom Styles -->
+  <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-  <div class="container">
 
-    <!-- Issue #6 The filename ledger mispelled. -->
-    <!-- <img src="ledgerr.png" alt="Ledger Header"> -->
-     <img src="ledger.png" alt="Ledger Header">
-    <h1>Ledger Balance System</h1>
-    <p id="greeting"></p>
-    <div class="form">
-      <label>Salary:       <input type="number" id="salary" placeholder="0"></label>
-      <label>Food:         <input type="number" id="food" placeholder="0"></label>
-      <label>Rent:         <input type="number" id="rent" placeholder="0"></label>
-      <label>Others:       <input type="number" id="others" placeholder="0"></label>
-      <label>Saving Goal:  <input type="number" id="saving" placeholder="0"></label>
-    </div>
-    <!-- Issue # adding id to calculate button to be able to select it in the script.js file. -->
-    <!-- <button>Calculate Balance</button> -->
-    <button id="calculate">Calculate Balance</button>
-    <div id="result" class="result"></div>
+  <div class="d-flex min-vh-100">
+    <!-- Left Navigation Sidebar -->
+    <aside class="hr-sidebar d-flex flex-column justify-content-between p-4">
+      <div>
+        <!-- Brand Header -->
+        <div class="d-flex align-items-center justify-content-between mb-4">
+          <div class="d-flex align-items-center gap-2">
+            <div class="hr-brand-badge">L</div>
+            <div class="fw-bold hr-heading" style="font-size: 0.95rem;">Ledger Studio</div>
+          </div>
+          <span class="badge rounded-pill text-bg-light border">2026</span>
+        </div>
+
+        <!-- Sidebar Navigation Tabs -->
+        <nav class="nav flex-column gap-1 mb-4">
+          <button type="button" id="tab-overview" class="nav-link hr-nav-link active text-start">Overview</button>
+          <button type="button" id="tab-ledger" class="nav-link hr-nav-link text-start">Ledger Management</button>
+          <button type="button" id="tab-budget" class="nav-link hr-nav-link text-start">Budget Management</button>
+        </nav>
+      </div>
+
+      <!-- Sidebar Footer -->
+      <div class="mt-4">
+        <!-- Illustration card -->
+        <div class="hr-sidebar-art mb-3">
+          <img src="ledger.png" alt="ledger image" />
+        </div>
+        <div class="pt-3 border-top">
+          <div class="small text-muted mb-1">Base Currency</div>
+          <div class="fw-semibold small">MYR (Malaysian Ringgit)</div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content Workspace -->
+    <main class="flex-grow-1 p-5">
+      <div class="container-fluid px-0" style="max-width: 1180px;">
+
+        <!-- Top Header & Controls -->
+        <header class="d-flex align-items-center justify-content-between gap-3 mb-4">
+          <div>
+            <!-- Greeting: filled in from the User profile in userModule.js -->
+            <div id="hello-user" class="hr-greeting mb-1"></div>
+            <h1 class="h3 fw-bold hr-heading mb-1">Personal Savings &amp; Cashflow</h1>
+            <p class="text-muted small mb-0">Track your monthly surplus, budget commitments and zero-spend days.</p>
+          </div>
+
+          <!-- Currency Switcher -->
+          <div class="d-flex align-items-center bg-white border rounded-pill px-3 py-1">
+            <label for="currency-select" class="small text-muted me-2 mb-0">Display</label>
+            <select id="currency-select" class="form-select form-select-sm border-0 fw-semibold p-0 pe-4 bg-transparent" style="width: auto; box-shadow: none;">
+              <option value="MYR" selected>MYR (RM)</option>
+              <option value="USD">USD ($)</option>
+              <option value="SGD">SGD (S$)</option>
+              <option value="AUD">AUD (A$)</option>
+              <option value="JPY">JPY (¥)</option>
+              <option value="EUR">EUR (€)</option>
+            </select>
+            <span id="fx-rate-badge" class="badge rounded-pill bg-light text-secondary ms-2 fw-normal">1 MYR = 1.00 MYR</span>
+          </div>
+        </header>
+
+        <!-- ===== Overview Tab ===== -->
+        <div id="view-overview">
+        <!-- KPI cards: d-flex puts them side by side, w-100 makes them share the row equally -->
+        <section class="d-flex gap-3 mb-4">
+          <!-- KPI 1: Accumulated Vault -->
+          <div class="hr-card hr-kpi-card w-100 p-4">
+            <div class="d-flex align-items-center justify-content-between mb-2">
+              <span class="hr-kpi-label">Accumulated Vault</span>
+              <span class="badge rounded-pill hr-pill-emerald">Nov 2026</span>
+            </div>
+            <div class="h3 fw-bold hr-heading tabular-nums mb-1" id="kpi-vault-total">RM 24,520.00</div>
+            <div class="small text-muted" id="kpi-vault-sub">Feb–Oct RM 22,100.00 + Nov RM 2,420.00 so far</div>
+          </div>
+
+          <!-- KPI 2: Salary Left to Spend -->
+          <div class="hr-card hr-kpi-card w-100 p-4">
+            <div class="d-flex align-items-center justify-content-between mb-2">
+              <span class="hr-kpi-label">Salary Left to Spend</span>
+              <span class="badge rounded-pill hr-pill-indigo" id="kpi-salary-pct-badge">37.2% left</span>
+            </div>
+            <div class="h3 fw-bold hr-heading tabular-nums mb-2" id="kpi-salary-remaining">RM 2,420.00</div>
+            <div class="progress mb-2" style="height: 6px; background-color: #EFECE6;">
+              <div id="kpi-salary-bar" class="progress-bar" style="width: 37.2%; background-color: #24A168;"></div>
+            </div>
+            <div class="small text-muted" id="kpi-salary-sub">of RM 6,500.00 monthly salary</div>
+          </div>
+
+          <!-- KPI 3: Zero-Spend Days -->
+          <div class="hr-card hr-kpi-card w-100 p-4">
+            <div class="d-flex align-items-center justify-content-between mb-2">
+              <span class="hr-kpi-label">Zero-Spend Days</span>
+              <span class="badge rounded-pill hr-pill-amber" id="kpi-nospend-target">Target: 15d</span>
+            </div>
+            <div class="h3 fw-bold hr-heading tabular-nums mb-2" id="kpi-nospend-count">11 / 30 days</div>
+            <div class="progress mb-2" style="height: 6px; background-color: #EFECE6;">
+              <div id="kpi-nospend-bar" class="progress-bar" style="width: 73.3%; background-color: #E0821B;"></div>
+            </div>
+            <div class="small text-muted" id="kpi-nospend-sub">73% of 15-day monthly restraint goal</div>
+          </div>
+        </section>
+
+        <!-- Daily Restraint Challenge (Zero-Spend Days) -->
+        <section id="section-restraint" class="hr-card overflow-hidden mb-4">
+          <div class="hr-restraint-banner p-4 text-white d-flex align-items-center justify-content-between">
+            <div>
+              <div class="text-uppercase fw-semibold opacity-75 mb-1" style="font-size: 0.7rem; letter-spacing: 0.08em;">
+                Daily Restraint Challenge
+              </div>
+              <h2 class="h4 fw-bold mb-0" id="restraint-header-count">11 / 30 Zero-Spend Days</h2>
+            </div>
+            <div class="hr-flame-badge">🔥</div>
+          </div>
+
+          <div class="p-4">
+            <div id="nospend-grid" class="d-flex flex-wrap gap-2 mb-3"></div>
+            <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 small text-muted pt-2 border-top">
+              <div class="d-flex align-items-center gap-3">
+                <span><span class="d-inline-block rounded-1 me-1" style="width:10px;height:10px;background:#24A168;"></span>No-spend day</span>
+                <span><span class="d-inline-block rounded-1 me-1 border border-danger-subtle" style="width:10px;height:10px;background:#FFF5F5;"></span>Spend day</span>
+              </div>
+              <span>Click any tile to toggle status</span>
+            </div>
+          </div>
+        </section>
+
+        </div>
+
+        <!-- ===== Ledger Management Tab ===== -->
+        <div id="view-ledger" class="d-none">
+        <!-- Monthly Savings Rollover Strip -->
+        <section id="section-rollover" class="hr-card p-4 mb-4">
+          <div class="d-flex align-items-center justify-content-between gap-2 mb-3">
+            <div>
+              <h2 class="h6 fw-bold hr-heading mb-0">Monthly Savings Rollover</h2>
+              <p class="small text-muted mb-0">Select any month to inspect its operating ledger and net surplus.</p>
+            </div>
+            <div class="small text-muted">
+              Selected Cycle: <strong id="selected-month-label" class="text-dark">Nov 2026 (Open)</strong>
+            </div>
+          </div>
+          <div id="month-pills-container" class="row g-2"></div>
+        </section>
+
+        <!-- Inline Quick Log Entry Card -->
+        <section id="section-quick-entry" class="hr-card p-4 mb-4">
+          <div class="mb-3">
+            <h2 class="h6 fw-bold hr-heading mb-0">Log Ledger Entry</h2>
+            <p class="small text-muted mb-0">Record an expense or income directly into your active operating ledger.</p>
+          </div>
+
+          <form id="inline-entry-form" class="row g-3 align-items-end">
+            <!-- Optional: fill from a saved monthly commitment -->
+            <div class="col-6">
+              <label for="entry-commitment" class="form-label small fw-semibold text-muted mb-1">From commitment <span class="fw-normal">(optional)</span></label>
+              <select id="entry-commitment" class="form-select form-select-sm">
+                <option value="">— None, enter manually —</option>
+              </select>
+            </div>
+            <div class="w-100 m-0"></div>
+
+            <!-- Direction Toggle -->
+            <div class="col-2">
+              <label class="form-label small fw-semibold text-muted mb-1">Type</label>
+              <div class="btn-group w-100">
+                <button type="button" id="dir-debit" class="btn btn-sm btn-outline-danger active fw-semibold">− Expense</button>
+                <button type="button" id="dir-credit" class="btn btn-sm btn-outline-success fw-semibold">+ Income</button>
+              </div>
+            </div>
+
+            <!-- Amount -->
+            <div class="col-2">
+              <label for="entry-amount" class="form-label small fw-semibold text-muted mb-1">Amount</label>
+              <div class="input-group input-group-sm">
+                <span id="entry-currency-prefix" class="input-group-text bg-light fw-semibold">RM</span>
+                <input type="number" step="0.01" min="0.01" id="entry-amount" class="form-control tabular-nums" placeholder="0.00" required />
+              </div>
+            </div>
+
+            <!-- Description -->
+            <div class="col-4">
+              <label for="entry-desc" class="form-label small fw-semibold text-muted mb-1">Description</label>
+              <input type="text" id="entry-desc" class="form-control form-control-sm" placeholder="e.g. ZUS Coffee, Groceries, Freelance..." required />
+            </div>
+
+            <!-- Category -->
+            <div class="col-2">
+              <label for="entry-category" class="form-label small fw-semibold text-muted mb-1">Category</label>
+              <select id="entry-category" class="form-select form-select-sm"></select>
+            </div>
+
+            <!-- Date & Submit -->
+            <div class="col-2 d-flex gap-2">
+              <input type="date" id="entry-date" class="form-control form-control-sm" value="2026-11-21" min="2026-11-01" max="2026-11-30" required />
+              <button type="submit" class="btn btn-sm hr-btn-primary fw-semibold px-3 text-nowrap">Save</button>
+            </div>
+          </form>
+        </section>
+
+        <!-- Operating Ledger Entries Table -->
+        <section id="section-ledger" class="hr-card p-4 mb-4">
+          <div class="d-flex align-items-center justify-content-between gap-2 mb-3">
+            <div>
+              <h2 class="h6 fw-bold hr-heading mb-0">Ledger Entries</h2>
+              <p class="small text-muted mb-0" id="ledger-subtitle">Showing all recorded entries for Nov 2026</p>
+            </div>
+
+            <div class="btn-group btn-group-sm" id="ledger-filter-group">
+              <button type="button" class="btn btn-dark active" data-filter="all">All</button>
+              <button type="button" class="btn btn-outline-secondary" data-filter="credit">Income</button>
+              <button type="button" class="btn btn-outline-secondary" data-filter="debit">Expenses</button>
+            </div>
+          </div>
+
+          <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
+              <tr class="small text-muted text-uppercase" style="font-size: 0.72rem;">
+                <th>Date</th>
+                <th>Description</th>
+                <th>Category</th>
+                <th class="text-end">Amount</th>
+                <th class="text-end">Action</th>
+              </tr>
+            </thead>
+            <tbody id="ledger-tbody" class="small"></tbody>
+          </table>
+        </section>
+
+        </div>
+
+
+        <!-- ===== Budget Management Tab ===== -->
+        <div id="view-budget" class="d-none">
+
+        <!-- Commitment Summary: same d-flex + w-100 layout as the Overview cards -->
+        <section class="d-flex gap-3 mb-4">
+          <div class="hr-card hr-kpi-card w-100 p-4">
+            <div class="hr-kpi-label mb-2">Monthly Commitments</div>
+            <div class="h3 fw-bold hr-heading tabular-nums mb-1" id="budget-total">RM 0.00</div>
+            <div class="small text-muted" id="budget-count">0 commitments</div>
+          </div>
+          <div class="hr-card hr-kpi-card w-100 p-4">
+            <div class="hr-kpi-label mb-2">Share of Salary</div>
+            <div class="h3 fw-bold hr-heading tabular-nums mb-2" id="budget-share">0%</div>
+            <div class="progress mb-2" style="height: 6px; background-color: #EFECE6;">
+              <div id="budget-share-bar" class="progress-bar" style="width: 0%; background-color: #7C5CFF;"></div>
+            </div>
+            <div class="small text-muted" id="budget-share-sub">of monthly salary</div>
+          </div>
+          <div class="hr-card hr-kpi-card w-100 p-4">
+            <div class="hr-kpi-label mb-2">Left After Commitments</div>
+            <div class="h3 fw-bold hr-heading tabular-nums mb-1" id="budget-free">RM 0.00</div>
+            <div class="small text-muted">Salary minus all commitments</div>
+          </div>
+          <div class="hr-card hr-kpi-card w-100 p-4">
+            <div class="hr-kpi-label mb-2">Paid This Month</div>
+            <div class="h3 fw-bold hr-heading tabular-nums mb-1" id="budget-paid">0 / 0</div>
+            <div class="small text-muted" id="budget-unpaid">RM 0.00 still to pay</div>
+          </div>
+        </section>
+
+        <!-- Add Commitment Form -->
+        <section id="section-budget-entry" class="hr-card p-4 mb-4">
+          <div class="mb-3">
+            <h2 class="h6 fw-bold hr-heading mb-0">Add Monthly Commitment</h2>
+            <p class="small text-muted mb-0">Save a recurring bill you expect to pay every month, e.g. TNB, TIME Wi-Fi, car loan.</p>
+          </div>
+
+          <form id="budget-form" class="row g-3 align-items-end">
+            <div class="col-5">
+              <label for="budget-name" class="form-label small fw-semibold text-muted mb-1">Commitment</label>
+              <input type="text" id="budget-name" class="form-control form-control-sm" placeholder="e.g. TNB Electricity" maxlength="60" required />
+            </div>
+            <div class="col-2">
+              <label for="budget-amount" class="form-label small fw-semibold text-muted mb-1">Amount</label>
+              <div class="input-group input-group-sm">
+                <span id="budget-currency-prefix" class="input-group-text bg-light fw-semibold">RM</span>
+                <input type="number" step="0.01" min="0.01" id="budget-amount" class="form-control tabular-nums" placeholder="0.00" required />
+              </div>
+            </div>
+            <div class="col-3">
+              <label for="budget-category" class="form-label small fw-semibold text-muted mb-1">Category</label>
+              <select id="budget-category" class="form-select form-select-sm"></select>
+            </div>
+            <div class="col-2">
+              <button type="submit" class="btn btn-sm hr-btn-primary fw-semibold w-100">Save</button>
+            </div>
+          </form>
+        </section>
+
+        <!-- Commitments List -->
+        <section id="section-budget-list" class="hr-card p-4 mb-4">
+          <div class="mb-3">
+            <h2 class="h6 fw-bold hr-heading mb-0">Your Commitments</h2>
+            <p class="small text-muted mb-0">Mark a commitment paid to log it in this month's ledger.</p>
+          </div>
+
+          <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
+              <tr class="small text-muted text-uppercase" style="font-size: 0.72rem;">
+                <th>Commitment</th>
+                <th>Category</th>
+                <th class="text-end">Amount</th>
+                <th class="text-end">Status</th>
+                <th class="text-end">Action</th>
+              </tr>
+            </thead>
+            <tbody id="budget-tbody" class="small"></tbody>
+          </table>
+        </section>
+        </div>
+
+      </div>
+    </main>
   </div>
-  <!-- Issue #8 module is rewuired to be imported in the script.js file. -->
-  <!-- <script src="script.js"></script> -->
-   <script type="module" src="script.js"></script>
+
+  <!-- Toast Notification -->
+  <div class="toast-container position-fixed bottom-0 end-0 p-3">
+    <div id="app-toast" class="toast text-bg-dark border-0">
+      <div class="toast-body small fw-medium" id="toast-message">Saved!</div>
+    </div>
+  </div>
+
+  <!-- Modular Scripts -->
+  <!-- script.js imports currencyExchange.js and userModule.js itself -->
+  <script type="module" src="script.js"></script>
 </body>
 </html>
