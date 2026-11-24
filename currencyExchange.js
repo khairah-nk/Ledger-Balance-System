@@ -1,18 +1,13 @@
-// The app stores every amount in Malaysian Ringgit
-const BASE_CURRENCY = 'MYR';
-
 // Symbol shown in front of each currency
 const SYMBOLS = {
   MYR: 'RM ',
   USD: '$',
   SGD: 'S$',
-  AUD: 'A$',
-  JPY: '¥',
-  EUR: '€'
+  AUD: 'A$'
 };
 
 // Asks the API how much 1 fromCurrency is worth in toCurrency
-const exchangeCurrency = async (fromCurrency = BASE_CURRENCY, toCurrency = BASE_CURRENCY) => {
+async function exchangeCurrency(fromCurrency, toCurrency) {
   // The API wants lowercase codes, e.g. "myr", "usd"
   const from = fromCurrency.toLowerCase();
   const to = toCurrency.toLowerCase();
@@ -30,35 +25,25 @@ const exchangeCurrency = async (fromCurrency = BASE_CURRENCY, toCurrency = BASE_
     const conversionRate = data[from][to];
     console.log(conversionRate);
 
-    // Make sure the API gave us a real, positive number
-    if (!Number.isFinite(conversionRate) || conversionRate <= 0) {
-      throw new Error(`No rate found for ${from} -> ${to}`);
-    }
-
     return conversionRate;
 
   } catch (error) {
     console.error('Error fetching exchange rates:', error);
     return null; // no rate: script.js keeps the current currency
   }
-};
+}
 
 
 // Turns an amount in MYR into display text, e.g. 100 MYR -> "$23.60"
-const formatFromBase = (amountInMyr, targetCurrency = BASE_CURRENCY, rate = 1, showPlus = false) => {
-  const currency = targetCurrency.toUpperCase();
-  const symbol = SYMBOLS[currency] || `${currency} `;
+function formatFromBase(amountInMyr, currency, rate, showPlus) {
+  const convertedAmount = amountInMyr * rate;
 
-  const convertedAmount = (Number(amountInMyr) || 0) * (Number(rate) || 1);
-
-  // Yen has no cents
-  const decimals = currency === 'JPY' ? 0 : 2;
+  // Always 2 decimals with commas, e.g. 2420 -> "2,420.00"
   const formattedNumber = Math.abs(convertedAmount).toLocaleString('en-US', {
-    minimumFractionDigits: decimals,
-    maximumFractionDigits: decimals
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2
   });
 
-  // Add "-" for spending, and "+" for income when asked
   let sign = '';
   if (convertedAmount < 0) {
     sign = '-';
@@ -66,19 +51,17 @@ const formatFromBase = (amountInMyr, targetCurrency = BASE_CURRENCY, rate = 1, s
     sign = '+';
   }
 
-  return `${sign}${symbol}${formattedNumber}`;
-};
+  return `${sign}${SYMBOLS[currency]}${formattedNumber}`;
+}
 
 
 // Turns an amount typed in the display currency back into MYR for saving
-const toBaseMyr = (displayAmount, rate = 1) => {
-  const safeRate = Number(rate) || 1;
-  return (Number(displayAmount) || 0) / safeRate;
-};
+function toBaseMyr(displayAmount, rate) {
+  return displayAmount / rate;
+}
 
 // Shared with other files (e.g. script.js imports these)
 export {
-  BASE_CURRENCY,
   SYMBOLS,
   exchangeCurrency,
   formatFromBase,

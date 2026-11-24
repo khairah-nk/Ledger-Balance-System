@@ -38,7 +38,7 @@
       <div class="mt-4">
         <!-- Illustration card -->
         <div class="hr-sidebar-art mb-3">
-          <img src="ledger.png" alt="ledger image" />
+          <img src="ledger.jpeg" alt="ledger image" />
         </div>
         <div class="pt-3 border-top">
           <div class="small text-muted mb-1">Base Currency</div>
@@ -68,8 +68,6 @@
               <option value="USD">USD ($)</option>
               <option value="SGD">SGD (S$)</option>
               <option value="AUD">AUD (A$)</option>
-              <option value="JPY">JPY (¥)</option>
-              <option value="EUR">EUR (€)</option>
             </select>
             <span id="fx-rate-badge" class="badge rounded-pill bg-light text-secondary ms-2 fw-normal">1 MYR = 1.00 MYR</span>
           </div>
@@ -85,8 +83,8 @@
               <span class="hr-kpi-label">Accumulated Vault</span>
               <span class="badge rounded-pill hr-pill-emerald">Nov 2026</span>
             </div>
-            <div class="h3 fw-bold hr-heading tabular-nums mb-1" id="kpi-vault-total">RM 24,520.00</div>
-            <div class="small text-muted" id="kpi-vault-sub">Feb–Oct RM 22,100.00 + Nov RM 2,420.00 so far</div>
+            <div class="h3 fw-bold hr-heading tabular-nums mb-1" id="kpi-vault-total">RM 12,330.00</div>
+            <div class="small text-muted" id="kpi-vault-sub">Jul–Oct RM 9,910.00 + Nov RM 2,420.00 so far</div>
           </div>
 
           <!-- KPI 2: Salary Left to Spend -->
@@ -146,14 +144,9 @@
         <div id="view-ledger" class="d-none">
         <!-- Monthly Savings Rollover Strip -->
         <section id="section-rollover" class="hr-card p-4 mb-4">
-          <div class="d-flex align-items-center justify-content-between gap-2 mb-3">
-            <div>
-              <h2 class="h6 fw-bold hr-heading mb-0">Monthly Savings Rollover</h2>
-              <p class="small text-muted mb-0">Select any month to inspect its operating ledger and net surplus.</p>
-            </div>
-            <div class="small text-muted">
-              Selected Cycle: <strong id="selected-month-label" class="text-dark">Nov 2026 (Open)</strong>
-            </div>
+          <div class="mb-3">
+            <h2 class="h6 fw-bold hr-heading mb-0">Monthly Savings Rollover</h2>
+            <p class="small text-muted mb-0">How much you saved each month. Past months are closed; November is still open.</p>
           </div>
           <div id="month-pills-container" class="row g-2"></div>
         </section>
@@ -218,7 +211,7 @@
           <div class="d-flex align-items-center justify-content-between gap-2 mb-3">
             <div>
               <h2 class="h6 fw-bold hr-heading mb-0">Ledger Entries</h2>
-              <p class="small text-muted mb-0" id="ledger-subtitle">Showing all recorded entries for Nov 2026</p>
+              <p class="small text-muted mb-0">Showing recorded entries for Nov 2026</p>
             </div>
 
             <div class="btn-group btn-group-sm" id="ledger-filter-group">
@@ -254,14 +247,6 @@
             <div class="hr-kpi-label mb-2">Monthly Commitments</div>
             <div class="h3 fw-bold hr-heading tabular-nums mb-1" id="budget-total">RM 0.00</div>
             <div class="small text-muted" id="budget-count">0 commitments</div>
-          </div>
-          <div class="hr-card hr-kpi-card w-100 p-4">
-            <div class="hr-kpi-label mb-2">Share of Salary</div>
-            <div class="h3 fw-bold hr-heading tabular-nums mb-2" id="budget-share">0%</div>
-            <div class="progress mb-2" style="height: 6px; background-color: #EFECE6;">
-              <div id="budget-share-bar" class="progress-bar" style="width: 0%; background-color: #7C5CFF;"></div>
-            </div>
-            <div class="small text-muted" id="budget-share-sub">of monthly salary</div>
           </div>
           <div class="hr-card hr-kpi-card w-100 p-4">
             <div class="hr-kpi-label mb-2">Left After Commitments</div>

@@ -3,7 +3,7 @@ import {
   CATEGORIES,
   EXPENSE_CATEGORIES,
   getGreeting,
-  getMonthMetrics,
+  getNovemberMetrics,
   getVaultSummary,
   addTransaction,
   deleteTransaction,
@@ -42,12 +42,12 @@ function showToast(msg) {
 
 function renderKPIs() {
   const vault = getVaultSummary();
-  const nov = getMonthMetrics('2026-11');
+  const nov = getNovemberMetrics();
   const noSpend = getNoSpendStats();
 
   // 1. Accumulated Vault
   document.getElementById('kpi-vault-total').textContent = fmt(vault.totalVaultMyr);
-  document.getElementById('kpi-vault-sub').textContent = `Feb–Oct ${fmt(vault.pastSurplus)} + Nov ${fmt(vault.novSurplus)} so far`;
+  document.getElementById('kpi-vault-sub').textContent = `Jul–Oct ${fmt(vault.pastSurplus)} + Nov ${fmt(vault.novSurplus)} so far`;
 
   // 2. Salary Left to Spend
   document.getElementById('kpi-salary-pct-badge').textContent = `${nov.salaryRemainingPct.toFixed(1)}% left`;
@@ -61,20 +61,19 @@ function renderKPIs() {
   document.getElementById('kpi-nospend-sub').textContent = `${noSpend.pct}% of ${noSpend.target}-day monthly restraint goal`;
 }
 
+// Month tiles: closed months show their saved amount, November shows its surplus so far
 function renderMonthPills() {
   const container = document.getElementById('month-pills-container');
   container.innerHTML = '';
 
   state.months.forEach(m => {
-    const metrics = getMonthMetrics(m.id);
-    const isSelected = state.selectedMonth === m.id;
-    const netVal = metrics.netOperatingSurplus;
     const closed = isMonthClosed(m.id);
+    const netVal = closed ? m.savings : getNovemberMetrics().netOperatingSurplus;
 
     const col = document.createElement('div');
     col.className = 'col-2';
     col.innerHTML = `
-      <button type="button" class="hr-month-tile ${isSelected ? 'active' : ''}" data-month="${m.id}">
+      <div class="hr-month-tile ${closed ? '' : 'active'}">
         <div class="d-flex align-items-center justify-content-between mb-1">
           <span class="fw-bold small">${m.label}</span>
           <span class="badge rounded-pill ${closed ? 'bg-light text-secondary border' : 'hr-pill-emerald'}" style="font-size:0.65rem;">
@@ -87,33 +86,19 @@ function renderMonthPills() {
         <div class="text-muted" style="font-size:0.7rem;">
           ${closed ? 'Saved to Vault' : 'Surplus so far'}
         </div>
-      </button>
+      </div>
     `;
-
-    col.querySelector('button').addEventListener('click', () => {
-      state.selectedMonth = m.id;
-      renderAll();
-    });
 
     container.appendChild(col);
   });
-
-  const activeMonthObj = state.months.find(m => m.id === state.selectedMonth);
-  if (activeMonthObj) {
-    document.getElementById('selected-month-label').textContent = `${activeMonthObj.label} (${isMonthClosed(activeMonthObj.id) ? 'Closed' : 'Open'})`;
-  }
 }
 
 function renderLedgerTable() {
   const tbody = document.getElementById('ledger-tbody');
   tbody.innerHTML = '';
 
-  const activeMonthObj = state.months.find(m => m.id === state.selectedMonth);
-  document.getElementById('ledger-subtitle').textContent = `Showing recorded entries for ${activeMonthObj ? activeMonthObj.label : state.selectedMonth}`
-    + (isMonthClosed(state.selectedMonth) ? ' · closed, entries are locked' : '');
-
+  // Every ledger entry is in November, the only open month
   const filtered = state.transactions.filter(tx => {
-    if (tx.month !== state.selectedMonth) return false;
     if (state.filterType === 'credit') return tx.amount > 0;
     if (state.filterType === 'debit') return tx.amount < 0;
     return true;
@@ -122,9 +107,6 @@ function renderLedgerTable() {
   if (filtered.length === 0) {
     tbody.innerHTML = `<tr><td colspan="5" class="text-center text-muted py-4">No entries match this filter.</td></tr>`;
   } else {
-    // Past months are closed, so their entries can't be deleted
-    const monthLocked = isMonthClosed(state.selectedMonth);
-
     filtered.forEach(tx => {
       const tr = document.createElement('tr');
       const isPositive = tx.amount > 0;
@@ -136,22 +118,16 @@ function renderLedgerTable() {
           ${fmt(tx.amount, true)}
         </td>
         <td class="text-end">
-          ${monthLocked
-            ? '<span class="badge bg-light text-muted border fw-normal">Locked</span>'
-            : `<button type="button" class="btn btn-sm btn-link text-danger text-decoration-none p-0 small" data-delete="${tx.id}">Delete</button>`
-          }
+          <button type="button" class="btn btn-sm btn-link text-danger text-decoration-none p-0 small" data-delete>Delete</button>
         </td>
       `;
 
-      const deleteBtn = tr.querySelector('[data-delete]');
-      if (deleteBtn) {
-        deleteBtn.addEventListener('click', () => {
-          if (!confirm(`Delete "${tx.desc}"? This can't be undone.`)) return;
-          deleteTransaction(tx.id);
-          renderAll();
-          showToast(`Deleted "${tx.desc}"`);
-        });
-      }
+      tr.querySelector('[data-delete]').addEventListener('click', () => {
+        if (!confirm(`Delete "${tx.desc}"? This can't be undone.`)) return;
+        deleteTransaction(tx.id);
+        renderAll();
+        showToast(`Deleted "${tx.desc}"`);
+      });
 
       tbody.appendChild(tr);
     });
@@ -187,26 +163,22 @@ function renderNoSpendGrid() {
 // Shows the current currency symbol (e.g. RM, $) in front of the Amount box
 function updateEntryCurrencyPrefix() {
   document.getElementById('entry-currency-prefix').textContent =
-    (SYMBOLS[state.displayCurrency] || state.displayCurrency).trim();
+    SYMBOLS[state.displayCurrency].trim();
 }
 
 function renderBudget() {
   const summary = getBudgetSummary();
-  const pctShare = Math.min(100, summary.sharePct);
 
   document.getElementById('budget-total').textContent = fmt(summary.total);
   document.getElementById('budget-count').textContent =
     `${summary.count} commitment${summary.count === 1 ? '' : 's'} per month`;
-  document.getElementById('budget-share').textContent = `${summary.sharePct.toFixed(1)}%`;
-  document.getElementById('budget-share-bar').style.width = `${pctShare}%`;
-  document.getElementById('budget-share-sub').textContent = `of ${fmt(summary.income)} monthly salary`;
   const freeEl = document.getElementById('budget-free');
   freeEl.textContent = fmt(summary.leftAfter);
   freeEl.classList.toggle('text-danger', summary.leftAfter < 0);
   document.getElementById('budget-paid').textContent = `${summary.paidCount} / ${summary.count}`;
   document.getElementById('budget-unpaid').textContent = `${fmt(summary.unpaidTotal)} still to pay`;
   document.getElementById('budget-currency-prefix').textContent =
-    (SYMBOLS[state.displayCurrency] || state.displayCurrency).trim();
+    SYMBOLS[state.displayCurrency].trim();
 
   const tbody = document.getElementById('budget-tbody');
   tbody.innerHTML = '';
@@ -250,11 +222,9 @@ function renderBudget() {
         renderAll();
         showToast(`Undid payment for "${c.name}"`);
       } else {
-        const result = payCommitment(c.id);
+        payCommitment(c.id);
         renderAll();
-        showToast(result.ok
-          ? `Logged ${fmt(-c.amount, true)} for "${c.name}" in the ledger`
-          : result.reason);
+        showToast(`Logged ${fmt(-c.amount, true)} for "${c.name}" in the ledger`);
       }
     });
 
@@ -410,8 +380,7 @@ function bindEvents() {
     // Couldn't get a rate: stay on the current currency and let the user know
     if (rate === null) {
       e.target.value = state.displayCurrency;
-      const decimalsNow = state.displayCurrency === 'JPY' ? 2 : 4;
-      badge.textContent = `1 MYR = ${state.exchangeRate.toFixed(decimalsNow)} ${state.displayCurrency}`;
+      badge.textContent = `1 MYR = ${state.exchangeRate.toFixed(4)} ${state.displayCurrency}`;
       showToast(`Couldn't get the ${target} rate. Check your connection and try again.`);
       return;
     }
@@ -419,12 +388,10 @@ function bindEvents() {
     state.displayCurrency = target;
     state.exchangeRate = rate;
 
-    const decimals = target === 'JPY' ? 2 : 4;
-    badge.textContent = `1 MYR = ${rate.toFixed(decimals)} ${target}`;
+    badge.textContent = `1 MYR = ${rate.toFixed(4)} ${target}`;
     renderAll();
   });
 
-  // Sidebar Tabs: Overview / Ledger
   // Sidebar Tabs: one button and one page for each tab
   const tabOverview = document.getElementById('tab-overview');
   const tabLedger = document.getElementById('tab-ledger');

@@ -136,17 +136,9 @@ body {
   border-radius: 12px;
   background-color: #FAF9F7;
   padding: 0.75rem;
-  cursor: pointer;
-  transition: all 0.15s ease;
-  text-align: left;
-  width: 100%;
 }
 
-.hr-month-tile:hover {
-  border-color: #C7C1B5;
-  background-color: #FFFFFF;
-}
-
+/* The open month (November) is highlighted */
 .hr-month-tile.active {
   border-color: #7C5CFF;
   background-color: #FFFFFF;
