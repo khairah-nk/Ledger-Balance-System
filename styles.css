@@ -1,0 +1,281 @@
+body {
+  background-color: #F9F8F6;
+  color: #1F1D1A;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+.hr-heading {
+  font-family: 'Inter', sans-serif;
+  color: #1F1D1A;
+  letter-spacing: -0.02em;
+}
+
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Sidebar */
+.hr-sidebar {
+  background-color: #F3F1ED;
+  border-bottom: 1px solid #E6E2DA;
+}
+
+@media (min-width: 992px) {
+  .hr-sidebar {
+    width: 244px;
+    min-width: 244px;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    border-bottom: none;
+    border-right: 1px solid #E6E2DA;
+  }
+}
+
+.hr-brand-badge {
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #7C5CFF 0%, #5B3FE0 100%);
+  color: #FFFFFF;
+  font-weight: 800;
+  box-shadow: 0 4px 10px rgba(124, 92, 255, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+
+/* Navigation links */
+.hr-nav-link {
+  color: #6E6A63;
+  font-size: 0.875rem;
+  font-weight: 500;
+  border-radius: 10px;
+  padding: 0.5rem 0.75rem;
+  transition: all 0.15s ease;
+}
+
+.hr-nav-link:hover {
+  background-color: #E9E5DD;
+  color: #1F1D1A;
+}
+
+.hr-nav-link.active {
+  background-color: #F1EDFF;
+  color: #5B3FE0;
+  font-weight: 600;
+  box-shadow: inset 0 0 0 1.5px #7C5CFF;
+}
+
+/* Cards & Surfaces */
+.hr-card {
+  background-color: #FFFFFF;
+  border: 1px solid #E6E2DA;
+  border-radius: 16px;
+  box-shadow: 0 2px 8px rgba(31, 29, 26, 0.03);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
+}
+
+/* KPI cards: violet top accent + lift on hover */
+.hr-kpi-card {
+  border: 1.5px solid #7C5CFF;
+}
+
+.hr-kpi-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(124, 92, 255, 0.12);
+}
+
+.hr-kpi-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #6E6A63;
+}
+
+/* used for buttons & the pills */
+.hr-btn-primary {
+  background-color: #1F1D1A;
+  color: #FFFFFF;
+  border: none;
+  border-radius: 10px;
+  padding: 0.55rem 0.85rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.hr-btn-primary:hover {
+  background-color: #36332E;
+  color: #FFFFFF;
+}
+
+.hr-pill-emerald {
+  background-color: #E7F6EF;
+  color: #17784B;
+  font-weight: 600;
+}
+
+.hr-pill-indigo {
+  background-color: #EEF2FF;
+  color: #4338CA;
+  font-weight: 600;
+}
+
+.hr-pill-amber {
+  background-color: #FEF3E6;
+  color: #B8620B;
+  font-weight: 600;
+}
+
+/* for the onth rollover Tiles */
+.hr-month-tile {
+  border: 1px solid #E6E2DA;
+  border-radius: 12px;
+  background-color: #FAF9F7;
+  padding: 0.75rem;
+}
+
+/* The open month (November) is highlighted */
+.hr-month-tile.active {
+  border-color: #7C5CFF;
+  background-color: #FFFFFF;
+  box-shadow: 0 0 0 3px #F1EDFF, 0 4px 12px rgba(124, 92, 255, 0.12);
+}
+
+/* for the rstraint Banner & Animated Flame Grid */
+.hr-restraint-banner {
+  background: linear-gradient(135deg, #2E1F47 0%, #432C68 100%);
+}
+
+.hr-flame-badge {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.12);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.35rem;
+}
+
+.hr-day-tile {
+  width: 44px;
+  height: 48px;
+  border-radius: 11px;
+  border: 1px solid #F3D1D1;
+  background-color: #FFF7F7;
+  color: #B85C5C;
+  font-size: 0.76rem;
+  font-weight: 700;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform 0.14s ease, box-shadow 0.14s ease;
+  user-select: none;
+}
+
+.hr-day-tile:hover {
+  transform: translateY(-2px);
+}
+
+.hr-day-tile.is-green {
+  background-color: #24A168;
+  border-color: #1B8454;
+  color: #FFFFFF;
+  box-shadow: 0 4px 10px rgba(36, 161, 104, 0.25);
+}
+
+.hr-day-flame {
+  font-size: 0.85rem;
+  line-height: 1;
+  animation: flameFlicker 1.8s infinite ease-in-out;
+}
+
+@keyframes flameFlicker {
+  0%, 100% { transform: scale(1) rotate(-2deg); }
+  50% { transform: scale(1.14) rotate(2deg); }
+}
+
+/* used for sidebar tab buttons */
+button.hr-nav-link {
+  border: 0;
+  background: transparent;
+  width: 100%;
+}
+
+/* Violet focus states for form controls */
+.form-control:focus,
+.form-select:focus {
+  border-color: #7C5CFF;
+  box-shadow: 0 0 0 0.2rem rgba(124, 92, 255, 0.18);
+}
+
+/* Primary (Save) button picks up the accent */
+.hr-btn-primary {
+  background-color: #5B3FE0;
+}
+
+.hr-btn-primary:hover {
+  background-color: #4A2FCC;
+}
+
+/* for budget Management */
+.hr-pill-violet {
+  background-color: #F1EDFF;
+  color: #5B3FE0;
+}
+
+.hr-link-violet {
+  color: #5B3FE0;
+  font-weight: 600;
+}
+
+.hr-link-violet:hover {
+  color: #4A2FCC;
+}
+
+/* greeting */
+.hr-greeting {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #5B3FE0;
+}
+
+.hr-wave {
+  display: inline-block;
+  transform-origin: 70% 70%;
+  animation: waveHand 2.4s ease-in-out 1;
+}
+
+@keyframes waveHand {
+  0%, 60%, 100% { transform: rotate(0deg); }
+  10%, 30% { transform: rotate(14deg); }
+  20% { transform: rotate(-8deg); }
+  40% { transform: rotate(-4deg); }
+  50% { transform: rotate(10deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hr-wave { animation: none; }
+}
+
+/* image for ledger */
+.hr-sidebar-art {
+  border-radius: 14px;
+  overflow: hidden;
+  border: 1px solid #E6E2DA;
+  background-color: #FFFFFF;
+  box-shadow: 0 2px 8px rgba(31, 29, 26, 0.04);
+}
+
+.hr-sidebar-art img {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1408 / 768;
+}
